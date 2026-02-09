@@ -418,9 +418,7 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
-// ==========================================
-// UTILITIES
-// ==========================================
+
 function escapeHtml(text) {
     const map = {
         '&': '&amp;',
@@ -432,9 +430,7 @@ function escapeHtml(text) {
     return String(text).replace(/[&<>"']/g, m => map[m]);
 }
 
-// ==========================================
-// CONSOLE ART
-// ==========================================
+
 console.log(`
 ╔═══════════════════════════════════════╗
 ║                                       ║
@@ -455,3 +451,4 @@ console.log(`
 Mot de passe: Emasi2026
 `);
 //KETFI NASSIM IS THE BEST DEV OAT
+//iLOVECODE&GOON
