@@ -438,7 +438,7 @@ function escapeHtml(text) {
 console.log(`
 ╔═══════════════════════════════════════╗
 ║                                       ║
-║      🚀 EMASI STOCK PREMIUM 🚀       ║
+║      🚀 EMASI STOCK  🚀       ║
 ║                                       ║
 ║   Système de gestion ultra-moderne   ║
 ║     Réseau de Transport RTE          ║
@@ -454,3 +454,4 @@ console.log(`
 
 Mot de passe: Emasi2026
 `);
+//KETFI NASSIM IS THE BEST DEV OAT
