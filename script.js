@@ -1,5 +1,5 @@
 /* ==========================================
-   EMASI STOCK - JavaScript
+   EMASI STOCK PREMIUM - JavaScript
    ========================================== */
 
 const PASSWORD = 'Emasi2026';
@@ -11,31 +11,25 @@ let pendingAction = null;
 // INITIALISATION
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 EMASI STOCK PREMIUM - Initialisation...');
     initializeTheme();
     loadItems();
     setupEventListeners();
+    updateStats();
 });
 
 // ==========================================
 // THEME
 // ==========================================
 function initializeTheme() {
-    const theme = localStorage.getItem('theme') || 'light';
-    if (theme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-    }
+    const theme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
 }
 
-document.getElementById('themeToggle').addEventListener('click', () => {
+document.getElementById('themeToggle')?.addEventListener('click', () => {
     const current = document.documentElement.getAttribute('data-theme');
     const newTheme = current === 'dark' ? 'light' : 'dark';
-    
-    if (newTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-        document.documentElement.removeAttribute('data-theme');
-    }
-    
+    document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
 });
 
@@ -44,35 +38,35 @@ document.getElementById('themeToggle').addEventListener('click', () => {
 // ==========================================
 function setupEventListeners() {
     // Bouton ajouter
-    document.getElementById('addItemBtn').addEventListener('click', openAddModal);
+    document.getElementById('addItemBtn')?.addEventListener('click', openAddModal);
     
     // Modals
-    document.getElementById('closeModal').addEventListener('click', closeItemModal);
-    document.getElementById('cancelBtn').addEventListener('click', closeItemModal);
-    document.getElementById('itemForm').addEventListener('submit', handleFormSubmit);
+    document.getElementById('closeModal')?.addEventListener('click', closeItemModal);
+    document.getElementById('cancelBtn')?.addEventListener('click', closeItemModal);
+    document.getElementById('itemForm')?.addEventListener('submit', handleFormSubmit);
     
     // Password modal
-    document.getElementById('closePasswordModal').addEventListener('click', closePasswordModal);
-    document.getElementById('cancelPassword').addEventListener('click', closePasswordModal);
-    document.getElementById('confirmPassword').addEventListener('click', validatePassword);
-    document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+    document.getElementById('closePasswordModal')?.addEventListener('click', closePasswordModal);
+    document.getElementById('cancelPassword')?.addEventListener('click', closePasswordModal);
+    document.getElementById('confirmPassword')?.addEventListener('click', validatePassword);
+    document.getElementById('passwordInput')?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') validatePassword();
     });
     
     // Image modal
-    document.getElementById('closeImageModal').addEventListener('click', closeImageModal);
-    document.getElementById('imageModal').addEventListener('click', (e) => {
+    document.getElementById('closeImageModal')?.addEventListener('click', closeImageModal);
+    document.getElementById('imageModal')?.addEventListener('click', (e) => {
         if (e.target.id === 'imageModal') closeImageModal();
     });
     
     // Search
-    document.getElementById('searchInput').addEventListener('input', filterItems);
+    document.getElementById('searchInput')?.addEventListener('input', filterItems);
     
     // Close modals on outside click
-    document.getElementById('itemModal').addEventListener('click', (e) => {
+    document.getElementById('itemModal')?.addEventListener('click', (e) => {
         if (e.target.id === 'itemModal') closeItemModal();
     });
-    document.getElementById('passwordModal').addEventListener('click', (e) => {
+    document.getElementById('passwordModal')?.addEventListener('click', (e) => {
         if (e.target.id === 'passwordModal') closePasswordModal();
     });
 }
@@ -97,7 +91,48 @@ function loadItems() {
         }
         
         displayItems();
+        updateStats();
     });
+}
+
+// ==========================================
+// UPDATE STATS
+// ==========================================
+function updateStats() {
+    const totalItems = items.length;
+    const totalQuantity = items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+    
+    const totalItemsEl = document.getElementById('totalItems');
+    const totalQuantityEl = document.getElementById('totalQuantity');
+    
+    if (totalItemsEl) {
+        animateNumber(totalItemsEl, parseInt(totalItemsEl.textContent) || 0, totalItems);
+    }
+    
+    if (totalQuantityEl) {
+        animateNumber(totalQuantityEl, parseInt(totalQuantityEl.textContent) || 0, totalQuantity);
+    }
+}
+
+function animateNumber(element, start, end) {
+    const duration = 1000;
+    const startTime = performance.now();
+    
+    function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+        const current = Math.floor(start + (end - start) * easeOutQuart);
+        
+        element.textContent = current;
+        
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        }
+    }
+    
+    requestAnimationFrame(update);
 }
 
 // ==========================================
@@ -105,6 +140,8 @@ function loadItems() {
 // ==========================================
 function displayItems() {
     const tbody = document.getElementById('stockTableBody');
+    
+    if (!tbody) return;
     
     if (items.length === 0) {
         tbody.innerHTML = `
@@ -115,8 +152,8 @@ function displayItems() {
                         <line x1="9" y1="9" x2="15" y2="9"></line>
                         <line x1="9" y1="15" x2="15" y2="15"></line>
                     </svg>
-                    <p>Aucun article en stock</p>
-                    <p style="font-size: 0.875rem;">Cliquez sur "Ajouter" pour commencer</p>
+                    <p>AUCUN ARTICLE EN STOCK</p>
+                    <p style="font-size: 0.9rem; margin-top: 0.5rem;">Cliquez sur "NOUVEL ARTICLE" pour commencer</p>
                 </td>
             </tr>
         `;
@@ -148,8 +185,11 @@ function displayItems() {
 // FILTRER LES ARTICLES
 // ==========================================
 function filterItems() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
     const tbody = document.getElementById('stockTableBody');
+    
+    if (!tbody) return;
+    
     const rows = tbody.getElementsByTagName('tr');
     
     Array.from(rows).forEach(row => {
@@ -163,71 +203,107 @@ function filterItems() {
 // ==========================================
 function openAddModal() {
     console.log('🔵 Bouton Ajouter cliqué');
-    console.log('🔵 Appel de openPasswordModal');
+    console.log('🔵 Appel de openPasswordModal...');
     openPasswordModal(() => {
-        console.log('✅ Mot de passe validé');
+        console.log('✅ Mot de passe validé - Ouverture formulaire');
         currentEditId = null;
-        document.getElementById('modalTitle').textContent = 'Nouvel article';
-        document.getElementById('itemForm').reset();
-        document.getElementById('itemModal').classList.add('active');
+        
+        const modalTitle = document.getElementById('modalTitle');
+        const itemForm = document.getElementById('itemForm');
+        const itemModal = document.getElementById('itemModal');
+        
+        console.log('📋 modalTitle:', modalTitle);
+        console.log('📋 itemForm:', itemForm);
+        console.log('📋 itemModal:', itemModal);
+        
+        if (modalTitle) modalTitle.textContent = 'NOUVEL ARTICLE';
+        if (itemForm) itemForm.reset();
+        if (itemModal) {
+            itemModal.classList.add('active');
+            console.log('✅ Modal active ajoutée !');
+        } else {
+            console.error('❌ itemModal introuvable !');
+        }
     });
 }
 
 function openEditModal(item) {
     currentEditId = item.id;
-    document.getElementById('modalTitle').textContent = 'Modifier l\'article';
+    document.getElementById('modalTitle').textContent = 'MODIFIER L\'ARTICLE';
     document.getElementById('inputLocation').value = item.location || '';
     document.getElementById('inputName').value = item.name || '';
     document.getElementById('inputQuantity').value = item.quantity || 0;
     document.getElementById('inputImage').value = item.image || '';
-    document.getElementById('itemModal').classList.add('active');
+    document.getElementById('itemModal')?.classList.add('active');
 }
 
 function closeItemModal() {
-    document.getElementById('itemModal').classList.remove('active');
+    document.getElementById('itemModal')?.classList.remove('active');
     currentEditId = null;
 }
 
 function openPasswordModal(action) {
     console.log('🔑 openPasswordModal appelée');
     pendingAction = action;
-    document.getElementById('passwordInput').value = '';
-    document.getElementById('passwordError').style.display = 'none';
-    document.getElementById('passwordModal').classList.add('active');
+    const passwordInput = document.getElementById('passwordInput');
+    const passwordError = document.getElementById('passwordError');
+    
+    if (passwordInput) passwordInput.value = '';
+    if (passwordError) passwordError.style.display = 'none';
+    
+    document.getElementById('passwordModal')?.classList.add('active');
     console.log('🔑 Modal de mot de passe ouverte');
-    setTimeout(() => document.getElementById('passwordInput').focus(), 100);
+    
+    setTimeout(() => {
+        document.getElementById('passwordInput')?.focus();
+    }, 100);
 }
 
 function closePasswordModal() {
-    document.getElementById('passwordModal').classList.remove('active');
+    document.getElementById('passwordModal')?.classList.remove('active');
     pendingAction = null;
 }
 
 function validatePassword() {
-    const input = document.getElementById('passwordInput').value;
+    const input = document.getElementById('passwordInput')?.value;
     const errorEl = document.getElementById('passwordError');
     
+    console.log('🔑 Validation du mot de passe...');
+    console.log('🔑 Input:', input);
+    console.log('🔑 PASSWORD attendu:', PASSWORD);
+    console.log('🔑 Match:', input === PASSWORD);
+    
     if (input === PASSWORD) {
+        console.log('✅ Mot de passe CORRECT !');
         closePasswordModal();
         if (pendingAction) {
+            console.log('🚀 Exécution de l\'action pendante...');
             pendingAction();
             pendingAction = null;
+        } else {
+            console.error('❌ Aucune action pendante !');
         }
     } else {
-        errorEl.textContent = 'Mot de passe incorrect';
-        errorEl.style.display = 'block';
-        document.getElementById('passwordInput').value = '';
-        document.getElementById('passwordInput').focus();
+        console.log('❌ Mot de passe INCORRECT !');
+        if (errorEl) {
+            errorEl.textContent = 'Mot de passe incorrect';
+            errorEl.style.display = 'block';
+        }
+        const passwordInput = document.getElementById('passwordInput');
+        if (passwordInput) {
+            passwordInput.value = '';
+            passwordInput.focus();
+        }
     }
 }
 
 window.openImageModal = function(imageUrl) {
     document.getElementById('modalImageContent').src = imageUrl;
-    document.getElementById('imageModal').classList.add('active');
+    document.getElementById('imageModal')?.classList.add('active');
 }
 
 function closeImageModal() {
-    document.getElementById('imageModal').classList.remove('active');
+    document.getElementById('imageModal')?.classList.remove('active');
 }
 
 // ==========================================
@@ -237,10 +313,10 @@ function handleFormSubmit(e) {
     e.preventDefault();
     
     const itemData = {
-        location: document.getElementById('inputLocation').value.trim(),
-        name: document.getElementById('inputName').value.trim(),
-        quantity: parseInt(document.getElementById('inputQuantity').value) || 0,
-        image: document.getElementById('inputImage').value.trim()
+        location: document.getElementById('inputLocation')?.value.trim() || '',
+        name: document.getElementById('inputName')?.value.trim() || '',
+        quantity: parseInt(document.getElementById('inputQuantity')?.value) || 0,
+        image: document.getElementById('inputImage')?.value.trim() || ''
     };
     
     if (currentEditId) {
@@ -316,10 +392,18 @@ window.deleteItem = function(id) {
 // ==========================================
 function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
+    if (!container) return;
+    
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     
-    const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ⓘ';
+    const icons = {
+        success: '✓',
+        error: '✕',
+        info: 'ℹ'
+    };
+    
+    const icon = icons[type] || icons.info;
     
     toast.innerHTML = `
         <span style="font-size: 1.25rem;">${icon}</span>
@@ -329,7 +413,7 @@ function showToast(message, type = 'info') {
     container.appendChild(toast);
     
     setTimeout(() => {
-        toast.style.animation = 'slideInRight 0.3s ease reverse';
+        toast.style.animation = 'toastSlideIn 0.3s ease reverse';
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
@@ -345,16 +429,28 @@ function escapeHtml(text) {
         '"': '&quot;',
         "'": '&#039;'
     };
-    return text.replace(/[&<>"']/g, m => map[m]);
+    return String(text).replace(/[&<>"']/g, m => map[m]);
 }
 
 // ==========================================
-// CONSOLE LOG
+// CONSOLE ART
 // ==========================================
 console.log(`
-╔════════════════════════════════════╗
-║      EMASI STOCK - RTE             ║
-║      Système de gestion de stock   ║
-║      Version 1.0                   ║
-╚════════════════════════════════════╝
+╔═══════════════════════════════════════╗
+║                                       ║
+║      🚀 EMASI STOCK PREMIUM 🚀       ║
+║                                       ║
+║   Système de gestion ultra-moderne   ║
+║     Réseau de Transport RTE          ║
+║                                       ║
+║          Version 2.0 Premium          ║
+║                                       ║
+╚═══════════════════════════════════════╝
+
+✨ Design: Cyber Futuriste
+🎨 Animations: Premium
+🔒 Sécurité: Maximale
+⚡ Performance: Optimale
+
+Mot de passe: Emasi2026
 `);
