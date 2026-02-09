@@ -162,10 +162,12 @@ function filterItems() {
 // MODALS
 // ==========================================
 function openAddModal() {
-    currentEditId = null;
-    document.getElementById('modalTitle').textContent = 'Nouvel article';
-    document.getElementById('itemForm').reset();
-    document.getElementById('itemModal').classList.add('active');
+    openPasswordModal(() => {
+        currentEditId = null;
+        document.getElementById('modalTitle').textContent = 'Nouvel article';
+        document.getElementById('itemForm').reset();
+        document.getElementById('itemModal').classList.add('active');
+    });
 }
 
 function openEditModal(item) {
