@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMASI STOCK PREMIUM - Gestion Avancée</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background animé -->
+    <div class="bg-wrapper">
+        <div class="bg-grid"></div>
+        <div class="bg-gradient"></div>
+        <div class="bg-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-container">
+                    <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#0066ff;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <circle cx="50" cy="50" r="35" fill="none" stroke="url(#logoGradient)" stroke-width="4"/>
+                        <path d="M 30 50 L 45 65 L 70 35" fill="none" stroke="url(#logoGradient)" stroke-width="4" stroke-linecap="round"/>
+                    </svg>
+                    <div class="logo-pulse"></div>
+                </div>
+                
+                <div class="brand">
+                    <h1>EMASI <span class="brand-accent">STOCK</span></h1>
+                    <p class="brand-subtitle">Système de Gestion Premium</p>
+                    <div class="status-indicator">
+                        <div class="status-dot"></div>
+                        <span class="status-text">Système Opérationnel</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <button class="btn-glass" id="themeToggle" title="Changer le thème">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                
+                <button class="btn-primary" id="addItemBtn">
+                    <span class="btn-shimmer"></span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    NOUVEL ARTICLE
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Stats Section -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="9" x2="15" y2="9"></line>
+                            <line x1="9" y1="15" x2="15" y2="15"></line>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalItems">0</div>
+                        <div class="stat-label">Articles Totaux</div>
+                    </div>
+                    <div class="stat-glow"></div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalQuantity">0</div>
+                        <div class="stat-label">Quantité Totale</div>
+                    </div>
+                    <div class="stat-glow"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-wrapper">
+                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="search-input" 
+                    placeholder="Rechercher un article, emplacement..."
+                >
+                <div class="search-line"></div>
+            </div>
+        </section>
+
+        <!-- Table Section -->
+        <section class="table-section">
+            <div class="table-container">
+                <table class="stock-table">
+                    <thead>
+                        <tr>
+                            <th>Emplacement</th>
+                            <th>Article</th>
+                            <th>Quantité</th>
+                            <th>Image</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stockTableBody">
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="9" y1="9" x2="15" y2="9"></line>
+                                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                                </svg>
+                                <p>AUCUN ARTICLE EN STOCK</p>
+                                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Cliquez sur "NOUVEL ARTICLE" pour commencer</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Item (Add/Edit) -->
+    <div class="modal" id="itemModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-glow"></div>
+            <div class="modal-header">
+                <h2 id="modalTitle">NOUVEL ARTICLE</h2>
+                <button class="btn-close" id="closeModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="itemForm">
+                    <div class="form-group">
+                        <label for="inputLocation">Emplacement</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="inputLocation" placeholder="Ex: Entrepôt A - Rayon 3" required>
+                            <div class="input-line"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="inputName">Nom de l'article</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="inputName" placeholder="Ex: Câble HDMI 2m" required>
+                            <div class="input-line"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="inputQuantity">Quantité</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="inputQuantity" placeholder="0" min="0" required>
+                            <div class="input-line"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="inputImage">URL de l'image (optionnel)</label>
+                        <div class="input-wrapper">
+                            <input type="url" id="inputImage" placeholder="https://...">
+                            <div class="input-line"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" id="cancelBtn">Annuler</button>
+                        <button type="submit" class="btn-primary">
+                            <span class="btn-shimmer"></span>
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Password -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-small">
+            <div class="modal-glow"></div>
+            <div class="modal-header">
+                <h2>AUTHENTIFICATION</h2>
+                <button class="btn-close" id="closePasswordModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="passwordInput">Mot de passe requis</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="passwordInput" placeholder="Entrez le mot de passe" autocomplete="off">
+                        <div class="input-line"></div>
+                    </div>
+                    <div class="error-message" id="passwordError">Mot de passe incorrect</div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="cancelPassword">Annuler</button>
+                    <button type="button" class="btn-primary" id="confirmPassword">
+                        <span class="btn-shimmer"></span>
+                        Confirmer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Image -->
+    <div class="modal" id="imageModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-image">
+            <button class="btn-close" id="closeImageModal" style="position: absolute; top: 1rem; right: 1rem; z-index: 10;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <img id="modalImageContent" src="" alt="Image agrandie">
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getDatabase, ref, onValue, push, set, update, remove } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+
+        // Configuration Firebase - REMPLACEZ PAR VOS PROPRES IDENTIFIANTS
+        const firebaseConfig = {
+            apiKey: "VOTRE_API_KEY",
+            authDomain: "VOTRE_AUTH_DOMAIN",
+            databaseURL: "VOTRE_DATABASE_URL",
+            projectId: "VOTRE_PROJECT_ID",
+            storageBucket: "VOTRE_STORAGE_BUCKET",
+            messagingSenderId: "VOTRE_MESSAGING_SENDER_ID",
+            appId: "VOTRE_APP_ID"
+        };
+
+        // Initialiser Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Rendre les fonctions Firebase disponibles globalement
+        window.firebaseDB = database;
+        window.firebaseRef = ref;
+        window.firebaseOnValue = onValue;
+        window.firebasePush = push;
+        window.firebaseSet = set;
+        window.firebaseUpdate = update;
+        window.firebaseRemove = remove;
+
+        console.log('🔥 Firebase initialisé avec succès');
+    </script>
+
+    <!-- Application JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
