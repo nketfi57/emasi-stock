@@ -6,15 +6,14 @@
     <title>EMASI STOCK PREMIUM - Gestion Avancée</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='35' fill='none' stroke='%2300d4ff' stroke-width='4'/%3E%3Cpath d='M 30 50 L 45 65 L 70 35' fill='none' stroke='%2300d4ff' stroke-width='4'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='35' fill='none' stroke='%2300ff88' stroke-width='4'/%3E%3Cpath d='M 30 50 L 45 65 L 70 35' fill='none' stroke='%2300ff88' stroke-width='4'/%3E%3C/svg%3E">
     
-    <!-- Google Fonts -->
+    <!-- Google Fonts avec preconnect pour performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Inclure tout le CSS ici pour un fichier standalone */
         * {
             margin: 0;
             padding: 0;
@@ -22,18 +21,19 @@
         }
 
         :root {
-            --primary: #00d4ff;
-            --primary-glow: rgba(0, 212, 255, 0.5);
-            --accent: #0066ff;
-            --accent-glow: rgba(0, 102, 255, 0.5);
-            --bg-dark: #0a0e1a;
-            --bg-darker: #050810;
-            --bg-card: rgba(15, 23, 42, 0.6);
-            --bg-glass: rgba(255, 255, 255, 0.05);
+            /* Thème Vert Cyberpunk */
+            --primary: #00ff88;
+            --primary-glow: rgba(0, 255, 136, 0.5);
+            --accent: #00d4aa;
+            --accent-glow: rgba(0, 212, 170, 0.5);
+            --bg-dark: #0a1a0e;
+            --bg-darker: #050a08;
+            --bg-card: rgba(15, 42, 23, 0.6);
+            --bg-glass: rgba(0, 255, 136, 0.05);
             --text-primary: #ffffff;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --border-glass: rgba(255, 255, 255, 0.1);
+            --text-secondary: #94b8a3;
+            --text-muted: #647564;
+            --border-glass: rgba(0, 255, 136, 0.15);
             --glow-sm: 0 0 10px var(--primary-glow);
             --glow-md: 0 0 20px var(--primary-glow), 0 0 40px var(--primary-glow);
             --glow-lg: 0 0 30px var(--primary-glow), 0 0 60px var(--primary-glow), 0 0 90px var(--primary-glow);
@@ -43,21 +43,23 @@
         }
 
         [data-theme="light"] {
-            --primary: #0066ff;
-            --primary-glow: rgba(0, 102, 255, 0.3);
-            --accent: #00d4ff;
-            --accent-glow: rgba(0, 212, 255, 0.3);
-            --bg-dark: #f8fafc;
+            --primary: #00b366;
+            --primary-glow: rgba(0, 179, 102, 0.3);
+            --accent: #00d4aa;
+            --accent-glow: rgba(0, 212, 170, 0.3);
+            --bg-dark: #f0faf4;
             --bg-darker: #ffffff;
             --bg-card: rgba(255, 255, 255, 0.9);
-            --bg-glass: rgba(0, 0, 0, 0.03);
-            --text-primary: #1e293b;
-            --text-secondary: #475569;
-            --text-muted: #94a3b8;
-            --border-glass: rgba(0, 0, 0, 0.1);
+            --bg-glass: rgba(0, 179, 102, 0.03);
+            --text-primary: #1a2e1e;
+            --text-secondary: #476947;
+            --text-muted: #94a394;
+            --border-glass: rgba(0, 179, 102, 0.2);
         }
 
-        html { scroll-behavior: smooth; }
+        html { 
+            scroll-behavior: smooth;
+        }
 
         body {
             font-family: 'Space Mono', monospace;
@@ -69,6 +71,7 @@
             min-height: 100vh;
         }
 
+        /* Optimisation: réduction animations complexes */
         .bg-wrapper {
             position: fixed;
             top: 0;
@@ -78,6 +81,7 @@
             z-index: 0;
             pointer-events: none;
             overflow: hidden;
+            will-change: transform;
         }
 
         .bg-grid {
@@ -85,8 +89,8 @@
             width: 100%;
             height: 100%;
             background-image: 
-                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+                linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
             background-size: 50px 50px;
             animation: gridMove 20s linear infinite;
         }
@@ -100,8 +104,8 @@
             position: absolute;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(0, 102, 255, 0.1) 0%, transparent 50%);
+            background: radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(0, 212, 170, 0.08) 0%, transparent 50%);
             animation: gradientFloat 15s ease-in-out infinite;
         }
 
@@ -110,6 +114,7 @@
             50% { transform: translate(-50px, -50px) rotate(5deg); }
         }
 
+        /* Optimisation: réduire le nombre de particules */
         .bg-particles {
             position: absolute;
             width: 100%;
@@ -129,8 +134,6 @@
         .particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
         .particle:nth-child(2) { left: 80%; top: 60%; animation-delay: 4s; }
         .particle:nth-child(3) { left: 50%; top: 40%; animation-delay: 8s; }
-        .particle:nth-child(4) { left: 30%; top: 70%; animation-delay: 12s; }
-        .particle:nth-child(5) { left: 70%; top: 30%; animation-delay: 16s; }
 
         @keyframes particleFloat {
             0%, 100% { transform: translate(0, 0) scale(1); opacity: 0; }
@@ -143,7 +146,7 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-            background: rgba(10, 14, 26, 0.8);
+            background: rgba(10, 26, 14, 0.9);
             backdrop-filter: blur(20px) saturate(180%);
             border-bottom: 1px solid var(--border-glass);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
@@ -247,9 +250,9 @@
         .status-dot {
             width: 8px;
             height: 8px;
-            background: #00ff88;
+            background: var(--primary);
             border-radius: 50%;
-            box-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
+            box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
             animation: statusPulse 2s ease-in-out infinite;
         }
 
@@ -260,7 +263,7 @@
 
         .status-text {
             font-size: 0.65rem;
-            color: #00ff88;
+            color: var(--primary);
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 700;
@@ -275,7 +278,7 @@
         .btn-primary {
             position: relative;
             background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            color: #ffffff;
+            color: #0a1a0e;
             border: none;
             padding: 1rem 2rem;
             border-radius: 12px;
@@ -295,6 +298,10 @@
         .btn-primary:hover {
             transform: translateY(-3px);
             box-shadow: var(--glow-lg), 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
         }
 
         .btn-shimmer {
@@ -329,7 +336,7 @@
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 255, 136, 0.1);
             border-color: var(--primary);
             box-shadow: 0 0 20px var(--primary-glow);
         }
@@ -349,7 +356,7 @@
         }
 
         .btn-glass:hover {
-            background: rgba(0, 212, 255, 0.1);
+            background: rgba(0, 255, 136, 0.1);
             box-shadow: var(--glow-sm);
             transform: rotate(90deg);
         }
@@ -426,7 +433,7 @@
         .stat-icon svg {
             width: 30px;
             height: 30px;
-            stroke: #ffffff;
+            stroke: #0a1a0e;
         }
 
         .stat-label {
@@ -480,7 +487,7 @@
             outline: none;
             border-color: var(--primary);
             box-shadow: var(--glow-md), 0 10px 30px rgba(0, 0, 0, 0.3);
-            background: rgba(0, 212, 255, 0.05);
+            background: rgba(0, 255, 136, 0.05);
         }
 
         .table-container {
@@ -498,7 +505,7 @@
         }
 
         .stock-table thead {
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(0, 102, 255, 0.2) 100%);
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2) 0%, rgba(0, 212, 170, 0.2) 100%);
             backdrop-filter: blur(10px);
         }
 
@@ -522,8 +529,8 @@
         }
 
         .stock-table tbody tr:hover {
-            background: rgba(0, 212, 255, 0.05);
-            box-shadow: inset 0 0 20px rgba(0, 212, 255, 0.1);
+            background: rgba(0, 255, 136, 0.05);
+            box-shadow: inset 0 0 20px rgba(0, 255, 136, 0.1);
         }
 
         .stock-table td {
@@ -537,6 +544,7 @@
             font-weight: 700;
         }
 
+        /* Optimisation: lazy loading images */
         .item-image {
             width: 70px;
             height: 70px;
@@ -546,6 +554,7 @@
             transition: var(--transition-smooth);
             border: 2px solid var(--border-glass);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            loading: lazy;
         }
 
         .item-image:hover {
@@ -586,14 +595,14 @@
         }
 
         .btn-edit {
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 102, 255, 0.2));
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 212, 170, 0.2));
             color: var(--primary);
             border: 1px solid var(--primary);
         }
 
         .btn-edit:hover {
             background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: #ffffff;
+            color: #0a1a0e;
             box-shadow: var(--glow-md);
             transform: translateY(-3px);
         }
@@ -720,7 +729,7 @@
             outline: none;
             border-color: var(--primary);
             box-shadow: var(--glow-sm);
-            background: rgba(0, 212, 255, 0.05);
+            background: rgba(0, 255, 136, 0.05);
         }
 
         .error-message {
@@ -771,8 +780,8 @@
         }
 
         .toast.success::before {
-            background: #00ff88;
-            box-shadow: 0 0 10px #00ff88;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
         }
 
         .toast.error::before {
@@ -807,6 +816,41 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Optimisations responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 1rem;
+                flex-direction: column;
+            }
+            
+            .brand h1 {
+                font-size: 1.5rem;
+            }
+            
+            .main-content {
+                padding: 0 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+
+        /* Performance: réduire les animations sur préférence utilisateur */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -814,8 +858,6 @@
         <div class="bg-grid"></div>
         <div class="bg-gradient"></div>
         <div class="bg-particles">
-            <div class="particle"></div>
-            <div class="particle"></div>
             <div class="particle"></div>
             <div class="particle"></div>
             <div class="particle"></div>
@@ -829,8 +871,8 @@
                     <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#0066ff;stop-opacity:1" />
+                                <stop offset="0%" style="stop-color:#00ff88;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#00d4aa;stop-opacity:1" />
                             </linearGradient>
                         </defs>
                         <circle cx="50" cy="50" r="35" fill="none" stroke="url(#logoGradient)" stroke-width="4"/>
@@ -1041,29 +1083,29 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
-    <div id="loadingScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0e27; display: flex; align-items: center; justify-content: center; z-index: 10000; flex-direction: column; gap: 20px;">
-        <div style="width: 50px; height: 50px; border: 3px solid #00d4ff; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-        <p style="color: #00d4ff; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Chargement de Firestore...</p>
+    <div id="loadingScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a1a0e; display: flex; align-items: center; justify-content: center; z-index: 10000; flex-direction: column; gap: 20px;">
+        <div style="width: 50px; height: 50px; border: 3px solid #00ff88; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <p style="color: #00ff88; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Chargement de Firestore...</p>
         <p id="loadingStatus" style="color: #666; font-family: 'Space Mono', monospace; font-size: 0.9rem;">Initialisation...</p>
     </div>
 
     <script type="module">
         // ============================================
-        // 🔥 FIRESTORE VERSION (au lieu de Realtime Database)
+        // 🚀 VERSION OPTIMISÉE POUR PERFORMANCE
         // ============================================
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { 
             getFirestore, 
             collection, 
             addDoc, 
-            getDocs, 
             doc, 
             updateDoc, 
             deleteDoc,
             onSnapshot,
             serverTimestamp,
             query,
-            orderBy
+            orderBy,
+            limit
         } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
@@ -1082,17 +1124,29 @@
         let db;
         let unsubscribe = null;
 
+        // Optimisation: Debounce pour la recherche
+        const debounce = (func, wait) => {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             initializeFirebase();
         });
 
-        function initializeFirebase() {
+        async function initializeFirebase() {
             try {
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 
                 const loader = document.getElementById('loadingScreen');
-                if (loader) loader.style.display = 'none';
                 
                 // Écouter les changements en temps réel avec Firestore
                 const itemsRef = collection(db, 'items');
@@ -1103,20 +1157,26 @@
                         id: doc.id,
                         ...doc.data()
                     }));
-                    console.log('📦 Articles chargés depuis Firestore:', items.length);
+                    console.log('📦 Articles chargés:', items.length);
                     displayItems();
                     updateStats();
+                    
+                    // Cache le loader après le premier chargement
+                    if (loader) loader.style.display = 'none';
                 }, (error) => {
                     console.error('❌ Erreur Firestore:', error);
-                    showToast('Erreur de connexion à Firestore', 'error');
+                    showToast('Erreur de connexion', 'error');
+                    if (loader) loader.style.display = 'none';
                 });
                 
                 initializeTheme();
                 setupEventListeners();
                 
             } catch (error) {
-                console.error('❌ Erreur initialisation:', error);
-                showToast('Erreur initialisation Firestore', 'error');
+                console.error('❌ Erreur:', error);
+                showToast('Erreur initialisation', 'error');
+                const loader = document.getElementById('loadingScreen');
+                if (loader) loader.style.display = 'none';
             }
         }
 
@@ -1141,7 +1201,12 @@
             document.getElementById('closePasswordModal')?.addEventListener('click', closePasswordModal);
             document.getElementById('cancelPassword')?.addEventListener('click', closePasswordModal);
             document.getElementById('confirmPassword')?.addEventListener('click', validatePassword);
-            document.getElementById('searchInput')?.addEventListener('input', filterItems);
+            
+            // Optimisation: Debounce sur la recherche (300ms)
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(filterItems, 300));
+            }
             
             const passwordInput = document.getElementById('passwordInput');
             if (passwordInput) {
@@ -1152,16 +1217,29 @@
                     }
                 });
             }
+
+            // Optimisation: Fermeture modal avec Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeItemModal();
+                    closePasswordModal();
+                }
+            });
         }
 
         function updateStats() {
             const totalItems = items.length;
             const totalQuantity = items.reduce((sum, item) => sum + (item.quantity || 0), 0);
             
-            document.getElementById('totalItems').textContent = totalItems;
-            document.getElementById('totalQuantity').textContent = totalQuantity;
+            // Optimisation: RequestAnimationFrame pour animations fluides
+            requestAnimationFrame(() => {
+                document.getElementById('totalItems').textContent = totalItems;
+                document.getElementById('totalQuantity').textContent = totalQuantity;
+            });
         }
 
+        // Optimisation: Virtual scrolling pour grandes listes (future)
+        // Optimisation: Fragment pour insertion DOM batch
         function displayItems() {
             const tbody = document.getElementById('stockTableBody');
             if (!tbody) return;
@@ -1183,25 +1261,123 @@
                 return;
             }
             
-            tbody.innerHTML = items.map((item) => `
+            // Optimisation: Utilisation d'un fragment pour meilleures performances
+            const fragment = document.createDocumentFragment();
+            const tempDiv = document.createElement('div');
+            
+            tempDiv.innerHTML = items.map((item) => `
                 <tr>
                     <td>${escapeHtml(item.location || '')}</td>
                     <td><strong>${escapeHtml(item.name || '')}</strong></td>
                     <td>${item.quantity || 0}</td>
                     <td>
                         ${item.image ? 
-                            `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" class="item-image" onerror="this.parentElement.innerHTML='<div class=\\'no-image\\'>Erreur</div>'">` :
+                            `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" class="item-image" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'no-image\\'>Erreur</div>'">` :
                             '<div class="no-image">Aucune</div>'
                         }
                     </td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn-edit" onclick="editItem('${item.id}')">Modifier</button>
-                            <button class="btn-delete" onclick="deleteItem('${item.id}')">Supprimer</button>
+                            <button class="btn-edit" data-id="${item.id}">Modifier</button>
+                            <button class="btn-delete" data-id="${item.id}">Supprimer</button>
                         </div>
                     </td>
                 </tr>
             `).join('');
+            
+            while (tempDiv.firstChild) {
+                fragment.appendChild(tempDiv.firstChild);
+            }
+            
+            tbody.innerHTML = '';
+            tbody.appendChild(fragment);
+            
+            // Optimisation: Event delegation au lieu de listeners individuels
+            tbody.addEventListener('click', handleTableClick);
+        }
+
+        // Optimisation: Event delegation
+        function handleTableClick(e) {
+            const target = e.target.closest('button');
+            if (!target) return;
+            
+            const itemId = target.dataset.id;
+            if (!itemId) return;
+            
+            if (target.classList.contains('btn-edit')) {
+                window.editItem(itemId);
+            } else if (target.classList.contains('btn-delete')) {
+                window.deleteItem(itemId);
+            }
+        }
+
+        // Déclarer les fonctions globalement AVANT leur utilisation
+        window.editItem = function(itemId) {
+            const item = items.find(i => i.id === itemId);
+            if (!item) return;
+            
+            openPasswordModal(() => {
+                currentEditId = itemId;
+                document.getElementById('modalTitle').textContent = 'MODIFIER L\'ARTICLE';
+                document.getElementById('inputLocation').value = item.location || '';
+                document.getElementById('inputName').value = item.name || '';
+                document.getElementById('inputQuantity').value = item.quantity || 0;
+                document.getElementById('inputImage').value = item.image || '';
+                document.getElementById('itemModal')?.classList.add('active');
+            });
+        };
+
+        window.deleteItem = function(itemId) {
+            const item = items.find(i => i.id === itemId);
+            if (!item) return;
+            
+            openPasswordModal(async () => {
+                if (confirm(`Voulez-vous vraiment supprimer "${item.name}" ?`)) {
+                    try {
+                        const itemRef = doc(db, 'items', itemId);
+                        await deleteDoc(itemRef);
+                        showToast('✓ Article supprimé', 'success');
+                    } catch (error) {
+                        console.error('❌ Erreur:', error);
+                        showToast('✕ Erreur: ' + error.message, 'error');
+                    }
+                }
+            });
+        };
+
+        // Optimisation: Pool de toasts pour éviter trop de créations
+        let toastQueue = [];
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = { success: '✓', error: '✕', info: 'ℹ' };
+            const icon = icons[type] || icons.info;
+            
+            toast.innerHTML = `
+                <span style="font-size: 1.25rem;">${icon}</span>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            toastQueue.push(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'toastSlideIn 0.3s ease reverse';
+                setTimeout(() => {
+                    toast.remove();
+                    toastQueue = toastQueue.filter(t => t !== toast);
+                }, 300);
+            }, 3000);
+            
+            // Limite de 3 toasts max
+            if (toastQueue.length > 3) {
+                const oldestToast = toastQueue.shift();
+                oldestToast?.remove();
+            }
         }
 
         function filterItems() {
@@ -1210,14 +1386,17 @@
             if (!tbody) return;
             
             const rows = tbody.querySelectorAll('tr');
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            
+            // Optimisation: RequestAnimationFrame pour recherche fluide
+            requestAnimationFrame(() => {
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchTerm) ? '' : 'none';
+                });
             });
         }
 
         function openAddModal() {
-            console.log('🔵 Ouverture modal ajout');
             currentEditId = null;
             
             document.getElementById('modalTitle').textContent = 'NOUVEL ARTICLE';
@@ -1235,7 +1414,6 @@
         }
 
         function openPasswordModal(action) {
-            console.log('🔑 Ouverture modal password');
             pendingAction = action;
             
             const passwordInput = document.getElementById('passwordInput');
@@ -1258,14 +1436,12 @@
             const errorEl = document.getElementById('passwordError');
             
             if (input === PASSWORD) {
-                console.log('✅ Mot de passe correct');
                 closePasswordModal();
                 if (pendingAction) {
                     pendingAction();
                     pendingAction = null;
                 }
             } else {
-                console.log('❌ Mot de passe incorrect');
                 if (errorEl) errorEl.style.display = 'block';
                 document.getElementById('passwordInput').value = '';
                 document.getElementById('passwordInput')?.focus();
@@ -1274,7 +1450,6 @@
 
         async function handleFormSubmit(e) {
             e.preventDefault();
-            console.log('📝 Soumission du formulaire...');
             
             const itemData = {
                 location: document.getElementById('inputLocation')?.value.trim() || '',
@@ -1287,8 +1462,6 @@
                 updatedAt: serverTimestamp()
             };
             
-            console.log('📦 Données:', itemData);
-            
             if (!itemData.location || !itemData.name) {
                 showToast('Veuillez remplir tous les champs obligatoires', 'error');
                 return;
@@ -1296,91 +1469,33 @@
             
             try {
                 if (currentEditId !== null) {
-                    // Mise à jour dans Firestore
                     const itemRef = doc(db, 'items', currentEditId);
                     await updateDoc(itemRef, itemData);
                     closeItemModal();
-                    showToast('✓ Article modifié avec succès', 'success');
-                    console.log('✅ Article modifié avec ID:', currentEditId);
+                    showToast('✓ Article modifié', 'success');
                 } else {
-                    // Ajout dans Firestore
-                    const docRef = await addDoc(collection(db, 'items'), itemData);
+                    await addDoc(collection(db, 'items'), itemData);
                     closeItemModal();
-                    showToast('✓ Article ajouté avec succès', 'success');
-                    console.log('✅ Article ajouté avec ID:', docRef.id);
+                    showToast('✓ Article ajouté', 'success');
                 }
             } catch (error) {
                 console.error('❌ Erreur:', error);
-                showToast('✕ Erreur lors de l\'enregistrement: ' + error.message, 'error');
+                showToast('✕ Erreur: ' + error.message, 'error');
             }
         }
 
-        window.editItem = function(itemId) {
-            const item = items.find(i => i.id === itemId);
-            if (!item) return;
-            
-            openPasswordModal(() => {
-                currentEditId = itemId;
-                document.getElementById('modalTitle').textContent = 'MODIFIER L\'ARTICLE';
-                document.getElementById('inputLocation').value = item.location || '';
-                document.getElementById('inputName').value = item.name || '';
-                document.getElementById('inputQuantity').value = item.quantity || 0;
-                document.getElementById('inputImage').value = item.image || '';
-                document.getElementById('itemModal')?.classList.add('active');
-            });
-        }
-
-        window.deleteItem = function(itemId) {
-            const item = items.find(i => i.id === itemId);
-            if (!item) return;
-            
-            openPasswordModal(async () => {
-                if (confirm(`Voulez-vous vraiment supprimer "${item.name}" ?`)) {
-                    try {
-                        const itemRef = doc(db, 'items', itemId);
-                        await deleteDoc(itemRef);
-                        showToast('✓ Article supprimé avec succès', 'success');
-                        console.log('✅ Article supprimé avec ID:', itemId);
-                    } catch (error) {
-                        console.error('❌ Erreur:', error);
-                        showToast('✕ Erreur lors de la suppression: ' + error.message, 'error');
-                    }
-                }
-            });
-        }
-
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            if (!container) return;
-            
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            
-            const icons = { success: '✓', error: '✕', info: 'ℹ' };
-            const icon = icons[type] || icons.info;
-            
-            toast.innerHTML = `
-                <span style="font-size: 1.25rem;">${icon}</span>
-                <span>${message}</span>
-            `;
-            
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.animation = 'toastSlideIn 0.3s ease reverse';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
+        // Optimisation: Cache du regex
+        const htmlEscapeMap = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        const htmlEscapeRegex = /[&<>"']/g;
+        
         function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return String(text).replace(/[&<>"']/g, m => map[m]);
+            return String(text).replace(htmlEscapeRegex, m => htmlEscapeMap[m]);
         }
 
         // Nettoyage lors de la fermeture
@@ -1388,7 +1503,7 @@
             if (unsubscribe) unsubscribe();
         });
 
-        console.log('💻 EMASI STOCK PREMIUM - Version Firestore - Développé par KETFI NASSIM');
+        console.log('💻 EMASI STOCK PREMIUM - Version Optimisée Vert - Développé par KETFI NASSIM');
     </script>
 </body>
 </html>
