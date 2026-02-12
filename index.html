@@ -1043,18 +1043,32 @@
 
     <div id="loadingScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0e27; display: flex; align-items: center; justify-content: center; z-index: 10000; flex-direction: column; gap: 20px;">
         <div style="width: 50px; height: 50px; border: 3px solid #00d4ff; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-        <p style="color: #00d4ff; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Chargement de Firebase...</p>
+        <p style="color: #00d4ff; font-family: 'Orbitron', sans-serif; font-size: 1.2rem;">Chargement de Firestore...</p>
         <p id="loadingStatus" style="color: #666; font-family: 'Space Mono', monospace; font-size: 0.9rem;">Initialisation...</p>
     </div>
 
     <script type="module">
+        // ============================================
+        // 🔥 FIRESTORE VERSION (au lieu de Realtime Database)
+        // ============================================
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, onValue, set, push, remove, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            getDocs, 
+            doc, 
+            updateDoc, 
+            deleteDoc,
+            onSnapshot,
+            serverTimestamp,
+            query,
+            orderBy
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyDrGXP2BLaJQb6KkXkfx9MBj-AhCGEtqy4",
             authDomain: "emasi-stock.firebaseapp.com",
-            databaseURL: "https://emasi-stock-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "emasi-stock",
             storageBucket: "emasi-stock.firebasestorage.app",
             messagingSenderId: "1009750476359",
@@ -1065,8 +1079,8 @@
         let items = [];
         let currentEditId = null;
         let pendingAction = null;
-        let database;
-        let itemsRef;
+        let db;
+        let unsubscribe = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             initializeFirebase();
@@ -1075,29 +1089,34 @@
         function initializeFirebase() {
             try {
                 const app = initializeApp(firebaseConfig);
-                database = getDatabase(app);
-                itemsRef = ref(database, 'items');
+                db = getFirestore(app);
                 
                 const loader = document.getElementById('loadingScreen');
                 if (loader) loader.style.display = 'none';
                 
-                onValue(itemsRef, (snapshot) => {
-                    const data = snapshot.val();
-                    items = data ? Object.entries(data).map(([id, item]) => ({ id, ...item })) : [];
-                    console.log('📦 Articles chargés:', items.length);
+                // Écouter les changements en temps réel avec Firestore
+                const itemsRef = collection(db, 'items');
+                const q = query(itemsRef, orderBy('createdAt', 'desc'));
+                
+                unsubscribe = onSnapshot(q, (snapshot) => {
+                    items = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+                    console.log('📦 Articles chargés depuis Firestore:', items.length);
                     displayItems();
                     updateStats();
                 }, (error) => {
-                    console.error('❌ Erreur Firebase:', error);
-                    showToast('Erreur de connexion', 'error');
+                    console.error('❌ Erreur Firestore:', error);
+                    showToast('Erreur de connexion à Firestore', 'error');
                 });
                 
                 initializeTheme();
                 setupEventListeners();
                 
             } catch (error) {
-                console.error('❌ Erreur:', error);
-                showToast('Erreur initialisation', 'error');
+                console.error('❌ Erreur initialisation:', error);
+                showToast('Erreur initialisation Firestore', 'error');
             }
         }
 
@@ -1171,7 +1190,7 @@
                     <td>${item.quantity || 0}</td>
                     <td>
                         ${item.image ? 
-                            `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" class="item-image">` :
+                            `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" class="item-image" onerror="this.parentElement.innerHTML='<div class=\\'no-image\\'>Erreur</div>'">` :
                             '<div class="no-image">Aucune</div>'
                         }
                     </td>
@@ -1262,7 +1281,10 @@
                 name: document.getElementById('inputName')?.value.trim() || '',
                 quantity: parseInt(document.getElementById('inputQuantity')?.value) || 0,
                 image: document.getElementById('inputImage')?.value.trim() || '',
-                createdAt: currentEditId ? items.find(i => i.id === currentEditId)?.createdAt || new Date().toISOString() : new Date().toISOString()
+                createdAt: currentEditId ? 
+                    items.find(i => i.id === currentEditId)?.createdAt || serverTimestamp() : 
+                    serverTimestamp(),
+                updatedAt: serverTimestamp()
             };
             
             console.log('📦 Données:', itemData);
@@ -1274,20 +1296,22 @@
             
             try {
                 if (currentEditId !== null) {
-                    const itemRef = ref(database, `items/${currentEditId}`);
-                    await update(itemRef, { ...itemData, updatedAt: new Date().toISOString() });
+                    // Mise à jour dans Firestore
+                    const itemRef = doc(db, 'items', currentEditId);
+                    await updateDoc(itemRef, itemData);
                     closeItemModal();
                     showToast('✓ Article modifié avec succès', 'success');
+                    console.log('✅ Article modifié avec ID:', currentEditId);
                 } else {
-                    const newItemRef = push(itemsRef);
-                    await set(newItemRef, itemData);
+                    // Ajout dans Firestore
+                    const docRef = await addDoc(collection(db, 'items'), itemData);
                     closeItemModal();
                     showToast('✓ Article ajouté avec succès', 'success');
-                    console.log('✅ Article ajouté avec ID:', newItemRef.key);
+                    console.log('✅ Article ajouté avec ID:', docRef.id);
                 }
             } catch (error) {
                 console.error('❌ Erreur:', error);
-                showToast('✕ Erreur lors de l\'enregistrement', 'error');
+                showToast('✕ Erreur lors de l\'enregistrement: ' + error.message, 'error');
             }
         }
 
@@ -1313,12 +1337,13 @@
             openPasswordModal(async () => {
                 if (confirm(`Voulez-vous vraiment supprimer "${item.name}" ?`)) {
                     try {
-                        const itemRef = ref(database, `items/${itemId}`);
-                        await remove(itemRef);
+                        const itemRef = doc(db, 'items', itemId);
+                        await deleteDoc(itemRef);
                         showToast('✓ Article supprimé avec succès', 'success');
+                        console.log('✅ Article supprimé avec ID:', itemId);
                     } catch (error) {
                         console.error('❌ Erreur:', error);
-                        showToast('✕ Erreur lors de la suppression', 'error');
+                        showToast('✕ Erreur lors de la suppression: ' + error.message, 'error');
                     }
                 }
             });
@@ -1358,7 +1383,12 @@
             return String(text).replace(/[&<>"']/g, m => map[m]);
         }
 
-        console.log('💻 EMASI STOCK PREMIUM - Développé par KETFI NASSIM');
+        // Nettoyage lors de la fermeture
+        window.addEventListener('beforeunload', () => {
+            if (unsubscribe) unsubscribe();
+        });
+
+        console.log('💻 EMASI STOCK PREMIUM - Version Firestore - Développé par KETFI NASSIM');
     </script>
 </body>
 </html>
