@@ -124,7 +124,10 @@ function setupEventListeners() {
     
     if (closeModalBtn) closeModalBtn.addEventListener('click', closeItemModal);
     if (cancelBtn) cancelBtn.addEventListener('click', closeItemModal);
-    if (itemForm) itemForm.addEventListener('submit', handleFormSubmit);
+    if (itemForm) {
+        itemForm.addEventListener('submit', handleFormSubmit);
+        console.log('✅ Formulaire configuré');
+    }
     
     // Password modal
     const closePasswordBtn = document.getElementById('closePasswordModal');
@@ -402,25 +405,50 @@ function closeImageModal() {
 }
 
 // ==========================================
-// FORM SUBMIT
+// FORM SUBMIT - CORRECTION ICI
 // ==========================================
-function handleFormSubmit(e) {
+async function handleFormSubmit(e) {
     e.preventDefault();
     
+    console.log('📝 Soumission du formulaire...');
+    
+    const locationInput = document.getElementById('inputLocation');
+    const nameInput = document.getElementById('inputName');
+    const quantityInput = document.getElementById('inputQuantity');
+    const imageInput = document.getElementById('inputImage');
+    
+    if (!locationInput || !nameInput || !quantityInput) {
+        console.error('❌ Champs du formulaire introuvables');
+        showToast('Erreur: Champs du formulaire introuvables', 'error');
+        return;
+    }
+    
     const itemData = {
-        location: document.getElementById('inputLocation')?.value.trim() || '',
-        name: document.getElementById('inputName')?.value.trim() || '',
-        quantity: parseInt(document.getElementById('inputQuantity')?.value) || 0,
-        image: document.getElementById('inputImage')?.value.trim() || '',
-        createdAt: new Date().toISOString()
+        location: locationInput.value.trim(),
+        name: nameInput.value.trim(),
+        quantity: parseInt(quantityInput.value) || 0,
+        image: imageInput?.value.trim() || '',
+        createdAt: currentEditId ? items.find(i => i.id === currentEditId)?.createdAt || new Date().toISOString() : new Date().toISOString()
     };
     
-    console.log('📝 Données du formulaire:', itemData);
+    console.log('📦 Données à enregistrer:', itemData);
     
-    if (currentEditId !== null) {
-        updateItem(currentEditId, itemData);
-    } else {
-        addItem(itemData);
+    if (!itemData.location || !itemData.name) {
+        showToast('Veuillez remplir tous les champs obligatoires', 'error');
+        return;
+    }
+    
+    try {
+        if (currentEditId !== null) {
+            console.log('✏️ Modification de l\'article:', currentEditId);
+            await updateItem(currentEditId, itemData);
+        } else {
+            console.log('➕ Ajout d\'un nouvel article');
+            await addItem(itemData);
+        }
+    } catch (error) {
+        console.error('❌ Erreur lors de la soumission:', error);
+        showToast('Erreur lors de l\'enregistrement', 'error');
     }
 }
 
@@ -429,15 +457,16 @@ function handleFormSubmit(e) {
 // ==========================================
 async function addItem(itemData) {
     try {
+        console.log('🔥 Ajout à Firebase...', itemData);
         const newItemRef = push(itemsRef);
         await set(newItemRef, itemData);
         
         closeItemModal();
-        showToast('Article ajouté avec succès', 'success');
-        console.log('✅ Article ajouté à Firebase');
+        showToast('✓ Article ajouté avec succès', 'success');
+        console.log('✅ Article ajouté à Firebase avec ID:', newItemRef.key);
     } catch (error) {
         console.error('❌ Erreur ajout:', error);
-        showToast('Erreur lors de l\'ajout', 'error');
+        showToast('✕ Erreur lors de l\'ajout', 'error');
     }
 }
 
@@ -455,6 +484,7 @@ window.editItem = function(itemId) {
 
 async function updateItem(itemId, itemData) {
     try {
+        console.log('🔥 Modification dans Firebase...', itemId, itemData);
         const itemRef = ref(database, `items/${itemId}`);
         
         await update(itemRef, {
@@ -463,11 +493,11 @@ async function updateItem(itemId, itemData) {
         });
         
         closeItemModal();
-        showToast('Article modifié avec succès', 'success');
+        showToast('✓ Article modifié avec succès', 'success');
         console.log('✅ Article modifié dans Firebase');
     } catch (error) {
         console.error('❌ Erreur modification:', error);
-        showToast('Erreur lors de la modification', 'error');
+        showToast('✕ Erreur lors de la modification', 'error');
     }
 }
 
@@ -481,14 +511,15 @@ window.deleteItem = function(itemId) {
     openPasswordModal(async () => {
         if (confirm(`Voulez-vous vraiment supprimer "${item.name}" ?`)) {
             try {
+                console.log('🔥 Suppression de Firebase...', itemId);
                 const itemRef = ref(database, `items/${itemId}`);
                 await remove(itemRef);
                 
-                showToast('Article supprimé avec succès', 'success');
+                showToast('✓ Article supprimé avec succès', 'success');
                 console.log('✅ Article supprimé de Firebase');
             } catch (error) {
                 console.error('❌ Erreur suppression:', error);
-                showToast('Erreur lors de la suppression', 'error');
+                showToast('✕ Erreur lors de la suppression', 'error');
             }
         }
     });
