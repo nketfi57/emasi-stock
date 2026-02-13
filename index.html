@@ -1298,61 +1298,45 @@
             });
         };
 
-        // ✅ FONCTION DELETE SIMPLIFIÉE ET TESTÉE
+        // ✅ VERSION TEST AVEC ALERTS
         window.deleteItem = function(itemId) {
-            console.log('🗑️ DELETE APPELÉ - ID:', itemId);
-            const item = items.find(i => i.id === itemId);
+            alert('1️⃣ DELETE appelé pour: ' + itemId);
             
+            const item = items.find(i => i.id === itemId);
             if (!item) {
-                console.error('❌ Article non trouvé');
-                showToast('Article introuvable', 'error');
+                alert('❌ Article non trouvé');
                 return;
             }
             
-            console.log('📝 Article trouvé:', item.name);
+            alert('2️⃣ Article trouvé: ' + item.name);
             
-            // Stocker itemId pour l'utiliser après validation
-            window.pendingDeleteId = itemId;
-            window.pendingDeleteName = item.name;
-            
-            // Ouvrir modal mot de passe
+            // Ouvrir modal
             openPasswordModal(() => {
-                console.log('✅ CALLBACK EXÉCUTÉ après validation mot de passe');
-                console.log('🗑️ Suppression de:', window.pendingDeleteName);
+                alert('4️⃣ CALLBACK EXÉCUTÉ ! On va supprimer: ' + item.name);
                 
-                // Demander confirmation
-                setTimeout(() => {
-                    const userConfirmed = confirm(`⚠️ ATTENTION ⚠️\n\nVoulez-vous vraiment supprimer :\n\n"${window.pendingDeleteName}"\n\nCette action est IRRÉVERSIBLE !`);
-                    
-                    console.log('👤 Confirmation utilisateur:', userConfirmed);
-                    
-                    if (userConfirmed) {
-                        performDelete(window.pendingDeleteId);
-                    } else {
-                        console.log('❌ Suppression annulée');
-                        showToast('Suppression annulée', 'info');
-                    }
-                }, 100);
+                const userConfirmed = confirm('Voulez-vous vraiment supprimer: ' + item.name + ' ?');
+                
+                if (userConfirmed) {
+                    alert('5️⃣ Utilisateur a confirmé, suppression...');
+                    performDelete(itemId);
+                } else {
+                    alert('❌ Annulé');
+                }
             });
+            
+            alert('3️⃣ Modal ouvert, en attente du mot de passe...');
         };
         
-        // Fonction séparée pour la suppression
         async function performDelete(itemId) {
-            console.log('🔥 SUPPRESSION EN COURS - ID:', itemId);
+            alert('6️⃣ Suppression Firebase en cours...');
             
             try {
                 const itemRef = doc(db, 'items', itemId);
-                console.log('📄 Référence document créée');
-                
                 await deleteDoc(itemRef);
-                console.log('✅ deleteDoc() terminé');
-                
-                showToast('✓ Article supprimé avec succès !', 'success');
-                console.log('✅ SUPPRESSION RÉUSSIE !');
-                
+                alert('✅ SUCCÈS ! Article supprimé');
+                showToast('✓ Article supprimé !', 'success');
             } catch (error) {
-                console.error('❌ ERREUR SUPPRESSION:', error);
-                console.error('Détails:', error.message, error.code);
+                alert('❌ ERREUR: ' + error.message);
                 showToast('✕ Erreur: ' + error.message, 'error');
             }
         }
@@ -1449,30 +1433,32 @@
             const input = document.getElementById('passwordInput')?.value;
             const errorEl = document.getElementById('passwordError');
             
-            console.log('🔐 validatePassword() appelé');
-            console.log('📝 Mot de passe saisi:', input ? '***' : 'VIDE');
-            console.log('🎯 Mot de passe attendu:', PASSWORD);
-            console.log('✅ Match:', input === PASSWORD);
-            console.log('🔄 pendingAction existe:', !!pendingAction);
-            
             if (input === PASSWORD) {
-                console.log('✅ ✅ ✅ MOT DE PASSE CORRECT !');
+                alert('✅ Mot de passe CORRECT !');
+                
+                // ✅ SAUVEGARDER l'action AVANT de fermer le modal
+                const actionToExecute = pendingAction;
+                
+                console.log('Action sauvegardée:', !!actionToExecute);
+                
+                // Fermer le modal (qui va mettre pendingAction à null)
                 closePasswordModal();
                 
-                if (pendingAction) {
-                    console.log('🚀 EXÉCUTION DE L\'ACTION...');
+                // Exécuter l'action sauvegardée
+                if (actionToExecute) {
+                    alert('📞 Exécution de l\'action...');
                     try {
-                        pendingAction();
-                        console.log('✅ Action exécutée');
+                        actionToExecute();
+                        alert('✅ Action terminée !');
                     } catch (e) {
-                        console.error('❌ Erreur lors de l\'exécution:', e);
+                        alert('❌ ERREUR: ' + e.message);
+                        console.error('Erreur:', e);
                     }
-                    pendingAction = null;
                 } else {
-                    console.error('⚠️ PAS D\'ACTION EN ATTENTE !');
+                    alert('❌ PAS D\'ACTION !');
                 }
             } else {
-                console.log('❌ ❌ ❌ MOT DE PASSE INCORRECT');
+                alert('❌ Mot de passe INCORRECT !');
                 if (errorEl) errorEl.style.display = 'block';
                 document.getElementById('passwordInput').value = '';
                 document.getElementById('passwordInput')?.focus();
