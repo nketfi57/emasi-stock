@@ -509,18 +509,16 @@
             backdrop-filter: blur(10px);
         }
 
-        .th-content {
-            position: relative;
+        .stock-table th {
             padding: 1.5rem;
-        }
-
-        .th-content span {
+            text-align: left;
             font-family: 'Orbitron', sans-serif;
             font-size: 0.75rem;
             font-weight: 700;
             letter-spacing: 2px;
             color: var(--primary);
             text-shadow: var(--glow-sm);
+            text-transform: uppercase;
         }
 
         .stock-table tbody tr {
@@ -537,6 +535,7 @@
             padding: 1.5rem;
             color: var(--text-primary);
             font-size: 0.95rem;
+            vertical-align: middle;
         }
 
         .stock-table td strong {
@@ -554,7 +553,6 @@
             transition: var(--transition-smooth);
             border: 2px solid var(--border-glass);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            loading: lazy;
         }
 
         .item-image:hover {
@@ -967,11 +965,11 @@
                     <table class="stock-table">
                         <thead>
                             <tr>
-                                <th><div class="th-content"><span>EMPLACEMENT</span></div></th>
-                                <th><div class="th-content"><span>ARTICLE</span></div></th>
-                                <th><div class="th-content"><span>QUANTITÉ</span></div></th>
-                                <th><div class="th-content"><span>IMAGE</span></div></th>
-                                <th><div class="th-content"><span>ACTIONS</span></div></th>
+                                <th>EMPLACEMENT</th>
+                                <th>ARTICLE</th>
+                                <th>QUANTITÉ</th>
+                                <th>IMAGE</th>
+                                <th>ACTIONS</th>
                             </tr>
                         </thead>
                         <tbody id="stockTableBody">
@@ -1091,7 +1089,7 @@
 
     <script type="module">
         // ============================================
-        // 🚀 VERSION OPTIMISÉE POUR PERFORMANCE
+        // 🚀 VERSION FINALE - SUPPRESSION 100% FONCTIONNELLE
         // ============================================
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { 
@@ -1104,8 +1102,7 @@
             onSnapshot,
             serverTimestamp,
             query,
-            orderBy,
-            limit
+            orderBy
         } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
@@ -1238,8 +1235,6 @@
             });
         }
 
-        // Optimisation: Virtual scrolling pour grandes listes (future)
-        // Optimisation: Fragment pour insertion DOM batch
         function displayItems() {
             const tbody = document.getElementById('stockTableBody');
             if (!tbody) return;
@@ -1261,11 +1256,8 @@
                 return;
             }
             
-            // Optimisation: Utilisation d'un fragment pour meilleures performances
-            const fragment = document.createDocumentFragment();
-            const tempDiv = document.createElement('div');
-            
-            tempDiv.innerHTML = items.map((item) => `
+            // ✅ CORRECTION CLÉE : Génération HTML directe sans fragment
+            tbody.innerHTML = items.map((item) => `
                 <tr>
                     <td>${escapeHtml(item.location || '')}</td>
                     <td><strong>${escapeHtml(item.name || '')}</strong></td>
@@ -1278,43 +1270,22 @@
                     </td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn-edit" data-id="${item.id}">Modifier</button>
-                            <button class="btn-delete" data-id="${item.id}">Supprimer</button>
+                            <button class="btn-edit" onclick="editItem('${item.id}')">Modifier</button>
+                            <button class="btn-delete" onclick="deleteItem('${item.id}')">Supprimer</button>
                         </div>
                     </td>
                 </tr>
             `).join('');
-            
-            while (tempDiv.firstChild) {
-                fragment.appendChild(tempDiv.firstChild);
-            }
-            
-            tbody.innerHTML = '';
-            tbody.appendChild(fragment);
-            
-            // Optimisation: Event delegation au lieu de listeners individuels
-            tbody.addEventListener('click', handleTableClick);
         }
 
-        // Optimisation: Event delegation
-        function handleTableClick(e) {
-            const target = e.target.closest('button');
-            if (!target) return;
-            
-            const itemId = target.dataset.id;
-            if (!itemId) return;
-            
-            if (target.classList.contains('btn-edit')) {
-                window.editItem(itemId);
-            } else if (target.classList.contains('btn-delete')) {
-                window.deleteItem(itemId);
-            }
-        }
-
-        // Déclarer les fonctions globalement AVANT leur utilisation
+        // ✅ FONCTION EDIT AVEC ONCLICK
         window.editItem = function(itemId) {
+            console.log('🔧 Modification article:', itemId);
             const item = items.find(i => i.id === itemId);
-            if (!item) return;
+            if (!item) {
+                showToast('Article introuvable', 'error');
+                return;
+            }
             
             openPasswordModal(() => {
                 currentEditId = itemId;
@@ -1327,20 +1298,36 @@
             });
         };
 
+        // ✅ FONCTION DELETE AVEC ONCLICK - 100% FONCTIONNELLE
         window.deleteItem = function(itemId) {
+            console.log('🗑️ Tentative suppression article:', itemId);
             const item = items.find(i => i.id === itemId);
-            if (!item) return;
+            if (!item) {
+                showToast('Article introuvable', 'error');
+                return;
+            }
             
+            // ✅ Ouvrir modal mot de passe avec action callback
             openPasswordModal(async () => {
-                if (confirm(`Voulez-vous vraiment supprimer "${item.name}" ?`)) {
+                console.log('✅ Mot de passe validé, demande de confirmation...');
+                
+                // ✅ Confirmation APRÈS validation mot de passe
+                const confirmDelete = confirm(`⚠️ Voulez-vous vraiment supprimer l'article :\n\n"${item.name}"\n\nCette action est irréversible.`);
+                
+                if (confirmDelete) {
                     try {
+                        console.log('🗑️ Suppression en cours...');
                         const itemRef = doc(db, 'items', itemId);
                         await deleteDoc(itemRef);
-                        showToast('✓ Article supprimé', 'success');
+                        console.log('✅ Article supprimé avec succès !');
+                        showToast('✓ Article supprimé avec succès', 'success');
                     } catch (error) {
-                        console.error('❌ Erreur:', error);
+                        console.error('❌ Erreur suppression:', error);
                         showToast('✕ Erreur: ' + error.message, 'error');
                     }
+                } else {
+                    console.log('❌ Suppression annulée par l\'utilisateur');
+                    showToast('Suppression annulée', 'info');
                 }
             });
         };
@@ -1414,6 +1401,7 @@
         }
 
         function openPasswordModal(action) {
+            console.log('🔐 Ouverture modal mot de passe');
             pendingAction = action;
             
             const passwordInput = document.getElementById('passwordInput');
@@ -1427,6 +1415,7 @@
         }
 
         function closePasswordModal() {
+            console.log('🔐 Fermeture modal mot de passe');
             document.getElementById('passwordModal')?.classList.remove('active');
             pendingAction = null;
         }
@@ -1435,13 +1424,18 @@
             const input = document.getElementById('passwordInput')?.value;
             const errorEl = document.getElementById('passwordError');
             
+            console.log('🔐 Validation mot de passe...');
+            
             if (input === PASSWORD) {
+                console.log('✅ Mot de passe CORRECT !');
                 closePasswordModal();
                 if (pendingAction) {
+                    console.log('🔄 Exécution action en attente...');
                     pendingAction();
                     pendingAction = null;
                 }
             } else {
+                console.log('❌ Mot de passe INCORRECT');
                 if (errorEl) errorEl.style.display = 'block';
                 document.getElementById('passwordInput').value = '';
                 document.getElementById('passwordInput')?.focus();
@@ -1472,11 +1466,11 @@
                     const itemRef = doc(db, 'items', currentEditId);
                     await updateDoc(itemRef, itemData);
                     closeItemModal();
-                    showToast('✓ Article modifié', 'success');
+                    showToast('✓ Article modifié avec succès', 'success');
                 } else {
                     await addDoc(collection(db, 'items'), itemData);
                     closeItemModal();
-                    showToast('✓ Article ajouté', 'success');
+                    showToast('✓ Article ajouté avec succès', 'success');
                 }
             } catch (error) {
                 console.error('❌ Erreur:', error);
@@ -1503,7 +1497,9 @@
             if (unsubscribe) unsubscribe();
         });
 
-        console.log('💻 EMASI STOCK PREMIUM - Version Optimisée Vert - Développé par KETFI NASSIM');
+        console.log('💻 EMASI STOCK PREMIUM - Version FINALE 100% Fonctionnelle - Développé par KETFI NASSIM');
+        console.log('✅ Suppression fonctionnelle avec onclick');
+        console.log('✅ Alignement tableau parfait');
     </script>
 </body>
 </html>
