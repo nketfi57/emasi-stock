@@ -1298,39 +1298,64 @@
             });
         };
 
-        // ✅ FONCTION DELETE AVEC ONCLICK - 100% FONCTIONNELLE
+        // ✅ FONCTION DELETE SIMPLIFIÉE ET TESTÉE
         window.deleteItem = function(itemId) {
-            console.log('🗑️ Tentative suppression article:', itemId);
+            console.log('🗑️ DELETE APPELÉ - ID:', itemId);
             const item = items.find(i => i.id === itemId);
+            
             if (!item) {
+                console.error('❌ Article non trouvé');
                 showToast('Article introuvable', 'error');
                 return;
             }
             
-            // ✅ Ouvrir modal mot de passe avec action callback
-            openPasswordModal(async () => {
-                console.log('✅ Mot de passe validé, demande de confirmation...');
+            console.log('📝 Article trouvé:', item.name);
+            
+            // Stocker itemId pour l'utiliser après validation
+            window.pendingDeleteId = itemId;
+            window.pendingDeleteName = item.name;
+            
+            // Ouvrir modal mot de passe
+            openPasswordModal(() => {
+                console.log('✅ CALLBACK EXÉCUTÉ après validation mot de passe');
+                console.log('🗑️ Suppression de:', window.pendingDeleteName);
                 
-                // ✅ Confirmation APRÈS validation mot de passe
-                const confirmDelete = confirm(`⚠️ Voulez-vous vraiment supprimer l'article :\n\n"${item.name}"\n\nCette action est irréversible.`);
-                
-                if (confirmDelete) {
-                    try {
-                        console.log('🗑️ Suppression en cours...');
-                        const itemRef = doc(db, 'items', itemId);
-                        await deleteDoc(itemRef);
-                        console.log('✅ Article supprimé avec succès !');
-                        showToast('✓ Article supprimé avec succès', 'success');
-                    } catch (error) {
-                        console.error('❌ Erreur suppression:', error);
-                        showToast('✕ Erreur: ' + error.message, 'error');
+                // Demander confirmation
+                setTimeout(() => {
+                    const userConfirmed = confirm(`⚠️ ATTENTION ⚠️\n\nVoulez-vous vraiment supprimer :\n\n"${window.pendingDeleteName}"\n\nCette action est IRRÉVERSIBLE !`);
+                    
+                    console.log('👤 Confirmation utilisateur:', userConfirmed);
+                    
+                    if (userConfirmed) {
+                        performDelete(window.pendingDeleteId);
+                    } else {
+                        console.log('❌ Suppression annulée');
+                        showToast('Suppression annulée', 'info');
                     }
-                } else {
-                    console.log('❌ Suppression annulée par l\'utilisateur');
-                    showToast('Suppression annulée', 'info');
-                }
+                }, 100);
             });
         };
+        
+        // Fonction séparée pour la suppression
+        async function performDelete(itemId) {
+            console.log('🔥 SUPPRESSION EN COURS - ID:', itemId);
+            
+            try {
+                const itemRef = doc(db, 'items', itemId);
+                console.log('📄 Référence document créée');
+                
+                await deleteDoc(itemRef);
+                console.log('✅ deleteDoc() terminé');
+                
+                showToast('✓ Article supprimé avec succès !', 'success');
+                console.log('✅ SUPPRESSION RÉUSSIE !');
+                
+            } catch (error) {
+                console.error('❌ ERREUR SUPPRESSION:', error);
+                console.error('Détails:', error.message, error.code);
+                showToast('✕ Erreur: ' + error.message, 'error');
+            }
+        }
 
         // Optimisation: Pool de toasts pour éviter trop de créations
         let toastQueue = [];
@@ -1424,18 +1449,30 @@
             const input = document.getElementById('passwordInput')?.value;
             const errorEl = document.getElementById('passwordError');
             
-            console.log('🔐 Validation mot de passe...');
+            console.log('🔐 validatePassword() appelé');
+            console.log('📝 Mot de passe saisi:', input ? '***' : 'VIDE');
+            console.log('🎯 Mot de passe attendu:', PASSWORD);
+            console.log('✅ Match:', input === PASSWORD);
+            console.log('🔄 pendingAction existe:', !!pendingAction);
             
             if (input === PASSWORD) {
-                console.log('✅ Mot de passe CORRECT !');
+                console.log('✅ ✅ ✅ MOT DE PASSE CORRECT !');
                 closePasswordModal();
+                
                 if (pendingAction) {
-                    console.log('🔄 Exécution action en attente...');
-                    pendingAction();
+                    console.log('🚀 EXÉCUTION DE L\'ACTION...');
+                    try {
+                        pendingAction();
+                        console.log('✅ Action exécutée');
+                    } catch (e) {
+                        console.error('❌ Erreur lors de l\'exécution:', e);
+                    }
                     pendingAction = null;
+                } else {
+                    console.error('⚠️ PAS D\'ACTION EN ATTENTE !');
                 }
             } else {
-                console.log('❌ Mot de passe INCORRECT');
+                console.log('❌ ❌ ❌ MOT DE PASSE INCORRECT');
                 if (errorEl) errorEl.style.display = 'block';
                 document.getElementById('passwordInput').value = '';
                 document.getElementById('passwordInput')?.focus();
