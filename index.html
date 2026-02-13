@@ -8,10 +8,13 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='35' fill='none' stroke='%2300ff88' stroke-width='4'/%3E%3Cpath d='M 30 50 L 45 65 L 70 35' fill='none' stroke='%2300ff88' stroke-width='4'/%3E%3C/svg%3E">
     
-    <!-- Google Fonts avec preconnect pour performance -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- SheetJS Library for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
         * {
@@ -21,7 +24,6 @@
         }
 
         :root {
-            /* Thème Vert Cyberpunk */
             --primary: #00ff88;
             --primary-glow: rgba(0, 255, 136, 0.5);
             --accent: #00d4aa;
@@ -71,7 +73,6 @@
             min-height: 100vh;
         }
 
-        /* Optimisation: réduction animations complexes */
         .bg-wrapper {
             position: fixed;
             top: 0;
@@ -114,7 +115,6 @@
             50% { transform: translate(-50px, -50px) rotate(5deg); }
         }
 
-        /* Optimisation: réduire le nombre de particules */
         .bg-particles {
             position: absolute;
             width: 100%;
@@ -361,6 +361,32 @@
             transform: rotate(90deg);
         }
 
+        .btn-export {
+            position: relative;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 212, 170, 0.2));
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: var(--transition-smooth);
+            overflow: hidden;
+        }
+
+        .btn-export:hover {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #0a1a0e;
+            box-shadow: var(--glow-md);
+            transform: translateY(-3px);
+        }
+
         .btn-close {
             background: transparent;
             border: none;
@@ -543,7 +569,6 @@
             font-weight: 700;
         }
 
-        /* Optimisation: lazy loading images */
         .item-image {
             width: 70px;
             height: 70px;
@@ -815,7 +840,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Optimisations responsive */
         @media (max-width: 768px) {
             .header-content {
                 padding: 1rem;
@@ -837,9 +861,13 @@
             .action-buttons {
                 flex-direction: column;
             }
+
+            .header-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
         }
 
-        /* Performance: réduire les animations sur préférence utilisateur */
         @media (prefers-reduced-motion: reduce) {
             *,
             *::before,
@@ -902,6 +930,15 @@
                         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
+                </button>
+
+                <button class="btn-export" id="exportExcelBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    EXPORT EXCEL
                 </button>
                 
                 <button class="btn-primary" id="addItemBtn">
@@ -1088,9 +1125,6 @@
     </div>
 
     <script type="module">
-        // ============================================
-        // 🚀 VERSION FINALE - SUPPRESSION 100% FONCTIONNELLE
-        // ============================================
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { 
             getFirestore, 
@@ -1121,7 +1155,6 @@
         let db;
         let unsubscribe = null;
 
-        // Optimisation: Debounce pour la recherche
         const debounce = (func, wait) => {
             let timeout;
             return function executedFunction(...args) {
@@ -1144,8 +1177,6 @@
                 db = getFirestore(app);
                 
                 const loader = document.getElementById('loadingScreen');
-                
-                // Écouter les changements en temps réel avec Firestore
                 const itemsRef = collection(db, 'items');
                 const q = query(itemsRef, orderBy('createdAt', 'desc'));
                 
@@ -1158,7 +1189,6 @@
                     displayItems();
                     updateStats();
                     
-                    // Cache le loader après le premier chargement
                     if (loader) loader.style.display = 'none';
                 }, (error) => {
                     console.error('❌ Erreur Firestore:', error);
@@ -1192,6 +1222,7 @@
         function setupEventListeners() {
             document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
             document.getElementById('addItemBtn')?.addEventListener('click', openAddModal);
+            document.getElementById('exportExcelBtn')?.addEventListener('click', exportToExcel);
             document.getElementById('closeModal')?.addEventListener('click', closeItemModal);
             document.getElementById('cancelBtn')?.addEventListener('click', closeItemModal);
             document.getElementById('itemForm')?.addEventListener('submit', handleFormSubmit);
@@ -1199,7 +1230,6 @@
             document.getElementById('cancelPassword')?.addEventListener('click', closePasswordModal);
             document.getElementById('confirmPassword')?.addEventListener('click', validatePassword);
             
-            // Optimisation: Debounce sur la recherche (300ms)
             const searchInput = document.getElementById('searchInput');
             if (searchInput) {
                 searchInput.addEventListener('input', debounce(filterItems, 300));
@@ -1215,7 +1245,6 @@
                 });
             }
 
-            // Optimisation: Fermeture modal avec Escape
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     closeItemModal();
@@ -1228,7 +1257,6 @@
             const totalItems = items.length;
             const totalQuantity = items.reduce((sum, item) => sum + (item.quantity || 0), 0);
             
-            // Optimisation: RequestAnimationFrame pour animations fluides
             requestAnimationFrame(() => {
                 document.getElementById('totalItems').textContent = totalItems;
                 document.getElementById('totalQuantity').textContent = totalQuantity;
@@ -1256,7 +1284,6 @@
                 return;
             }
             
-            // ✅ CORRECTION CLÉE : Génération HTML directe sans fragment
             tbody.innerHTML = items.map((item) => `
                 <tr>
                     <td>${escapeHtml(item.location || '')}</td>
@@ -1278,7 +1305,6 @@
             `).join('');
         }
 
-        // ✅ FONCTION EDIT AVEC ONCLICK
         window.editItem = function(itemId) {
             console.log('🔧 Modification article:', itemId);
             const item = items.find(i => i.id === itemId);
@@ -1298,50 +1324,92 @@
             });
         };
 
-        // ✅ VERSION TEST AVEC ALERTS
         window.deleteItem = function(itemId) {
-            alert('1️⃣ DELETE appelé pour: ' + itemId);
-            
             const item = items.find(i => i.id === itemId);
             if (!item) {
-                alert('❌ Article non trouvé');
+                showToast('Article introuvable', 'error');
                 return;
             }
             
-            alert('2️⃣ Article trouvé: ' + item.name);
-            
-            // Ouvrir modal
             openPasswordModal(() => {
-                alert('4️⃣ CALLBACK EXÉCUTÉ ! On va supprimer: ' + item.name);
-                
-                const userConfirmed = confirm('Voulez-vous vraiment supprimer: ' + item.name + ' ?');
+                const userConfirmed = confirm(`Voulez-vous vraiment supprimer: ${item.name} ?`);
                 
                 if (userConfirmed) {
-                    alert('5️⃣ Utilisateur a confirmé, suppression...');
                     performDelete(itemId);
-                } else {
-                    alert('❌ Annulé');
                 }
             });
-            
-            alert('3️⃣ Modal ouvert, en attente du mot de passe...');
         };
         
         async function performDelete(itemId) {
-            alert('6️⃣ Suppression Firebase en cours...');
-            
             try {
                 const itemRef = doc(db, 'items', itemId);
                 await deleteDoc(itemRef);
-                alert('✅ SUCCÈS ! Article supprimé');
                 showToast('✓ Article supprimé !', 'success');
             } catch (error) {
-                alert('❌ ERREUR: ' + error.message);
+                console.error('❌ Erreur suppression:', error);
                 showToast('✕ Erreur: ' + error.message, 'error');
             }
         }
 
-        // Optimisation: Pool de toasts pour éviter trop de créations
+        function exportToExcel() {
+            if (items.length === 0) {
+                showToast('Aucune donnée à exporter', 'error');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+            
+            const exportData = items.map((item, index) => ({
+                'N°': index + 1,
+                'Emplacement': item.location || '',
+                'Article': item.name || '',
+                'Quantité': item.quantity || 0,
+                'Image URL': item.image || '',
+                'Date Création': item.createdAt?.toDate ? 
+                    new Date(item.createdAt.toDate()).toLocaleDateString('fr-FR') : 
+                    'N/A'
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+
+            const colWidths = [
+                { wch: 5 },
+                { wch: 30 },
+                { wch: 40 },
+                { wch: 12 },
+                { wch: 50 },
+                { wch: 15 }
+            ];
+            ws['!cols'] = colWidths;
+
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            for (let C = range.s.c; C <= range.e.c; ++C) {
+                const address = XLSX.utils.encode_col(C) + "1";
+                if (!ws[address]) continue;
+                ws[address].s = {
+                    font: { bold: true, sz: 12, name: 'Arial' },
+                    fill: { fgColor: { rgb: "00FF88" } },
+                    alignment: { horizontal: 'center', vertical: 'center' }
+                };
+            }
+
+            XLSX.utils.book_append_sheet(wb, ws, 'Stock EMASI');
+
+            const statsData = [
+                { 'Statistique': 'Total Articles', 'Valeur': items.length },
+                { 'Statistique': 'Quantité Totale', 'Valeur': items.reduce((sum, item) => sum + (item.quantity || 0), 0) },
+                { 'Statistique': 'Date Export', 'Valeur': new Date().toLocaleDateString('fr-FR') }
+            ];
+            const wsStats = XLSX.utils.json_to_sheet(statsData);
+            wsStats['!cols'] = [{ wch: 20 }, { wch: 15 }];
+            XLSX.utils.book_append_sheet(wb, wsStats, 'Statistiques');
+
+            const filename = `EMASI_Stock_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, filename);
+            
+            showToast('✓ Export Excel réussi !', 'success');
+        }
+
         let toastQueue = [];
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
@@ -1369,7 +1437,6 @@
                 }, 300);
             }, 3000);
             
-            // Limite de 3 toasts max
             if (toastQueue.length > 3) {
                 const oldestToast = toastQueue.shift();
                 oldestToast?.remove();
@@ -1383,7 +1450,6 @@
             
             const rows = tbody.querySelectorAll('tr');
             
-            // Optimisation: RequestAnimationFrame pour recherche fluide
             requestAnimationFrame(() => {
                 rows.forEach(row => {
                     const text = row.textContent.toLowerCase();
@@ -1434,31 +1500,18 @@
             const errorEl = document.getElementById('passwordError');
             
             if (input === PASSWORD) {
-                alert('✅ Mot de passe CORRECT !');
-                
-                // ✅ SAUVEGARDER l'action AVANT de fermer le modal
                 const actionToExecute = pendingAction;
-                
-                console.log('Action sauvegardée:', !!actionToExecute);
-                
-                // Fermer le modal (qui va mettre pendingAction à null)
                 closePasswordModal();
                 
-                // Exécuter l'action sauvegardée
                 if (actionToExecute) {
-                    alert('📞 Exécution de l\'action...');
                     try {
                         actionToExecute();
-                        alert('✅ Action terminée !');
                     } catch (e) {
-                        alert('❌ ERREUR: ' + e.message);
                         console.error('Erreur:', e);
+                        showToast('Erreur lors de l\'action', 'error');
                     }
-                } else {
-                    alert('❌ PAS D\'ACTION !');
                 }
             } else {
-                alert('❌ Mot de passe INCORRECT !');
                 if (errorEl) errorEl.style.display = 'block';
                 document.getElementById('passwordInput').value = '';
                 document.getElementById('passwordInput')?.focus();
@@ -1501,7 +1554,6 @@
             }
         }
 
-        // Optimisation: Cache du regex
         const htmlEscapeMap = {
             '&': '&amp;',
             '<': '&lt;',
@@ -1515,14 +1567,11 @@
             return String(text).replace(htmlEscapeRegex, m => htmlEscapeMap[m]);
         }
 
-        // Nettoyage lors de la fermeture
         window.addEventListener('beforeunload', () => {
             if (unsubscribe) unsubscribe();
         });
 
-        console.log('💻 EMASI STOCK PREMIUM - Version FINALE 100% Fonctionnelle - Développé par KETFI NASSIM');
-        console.log('✅ Suppression fonctionnelle avec onclick');
-        console.log('✅ Alignement tableau parfait');
+        console.log('💻 EMASI STOCK PREMIUM avec Export Excel - Développé par KETFI NASSIM');
     </script>
 </body>
 </html>
